@@ -8,43 +8,44 @@ bool checkBalanceBrackets(const char* string, const int maxDeep);
 
 int main() {
     size_t lenght = 0;
-    int i = 0;
     
-    std::cout << "Enter the size of stack: ";
+    std::cout << "Enter the size of a stack: ";
     std::cin >> lenght;
 
-    LimitedStack<int> steck(lenght);
+    LimitedStack<int> stack(lenght);
+    
+    char answer = 'Y';
+    while (answer != 'q' && answer != 'Q') {
+        std::cout << "What do you want to do with the stack? (P - push / G - get / Q - quit): ";
+        std::cin >> answer;
 
-    std::cout << "Enter " << lenght << " ints: " << std::endl;
-    try {
-        while (i != lenght) {
-            int element;
-            std::cin >> element;
-
-            steck.push(element);
-            i++;
+        if (answer == 'G' || answer == 'g') {
+            try {
+                std::cout << "Taken: " << stack.pop() << std::endl;
+            }
+            catch (const LimitedStack<int>::StackUnderflow& e) {
+                std::cerr << "Error: " << e.getMessage() << "\n";
+                return 1;
+            }
         }
-    }
-    catch (const LimitedStack<int>::StackOverflow& e) {
-        std::cerr << "Error: " << e.getMessage() << "\n";
-        return 1;
-    }
-
-    if (!steck.isEmpty()) std::cout << "Stack is not empty" << std::endl;
-
-    try {
-        char answer = 'Y';
-        while (answer != 'N' && answer != 'n') {
-            std::cout << "Do you want to pick up an item from the stack? (Y/N): ";
-            std::cin >> answer;
-            if (answer == 'Y' || answer == 'y') std::cout << "Taken: " << steck.pop() << std::endl;
-            else if (answer == 'N' || answer == 'n') std::cout << "Ok. End of the test... " << std::endl;
-            else std::cout << "Unknown character!" << std::endl;
+        else if (answer == 'P' || answer == 'p') {
+            try {
+                std::cout << "How many elements do you want to push: ";
+                int j = 0;
+                std::cin >> j;
+                for (int i = 0; i < j; i++) {
+                    int element;
+                    std::cin >> element;
+                    stack.push(element);
+                }
+            }
+            catch (const LimitedStack<int>::StackOverflow& e) {
+                std::cerr << "Error: " << e.getMessage() << "\n";
+                return 1;
+            }
         }
-    }
-    catch (const LimitedStack<int>::StackUnderflow& e) {
-        std::cerr << "Error: " << e.getMessage() << "\n";
-        return 1;
+        else if (answer == 'Q' || answer == 'q') { std::cout << "Ok. End of the test... " << std::endl; }
+        else { std::cout << "Unknown character!" << std::endl; }
     }
     
     std::cout << std::endl << "BRACKETS CHECK" << std::endl;
@@ -69,43 +70,44 @@ int main() {
     }
 
     size_t qlenght = 0;
-    int j = 0;
 
-    std::cout << std::endl << "Enter the size of queue: ";
+    std::cout << std::endl << "Enter the size of a queue: ";
     std::cin >> qlenght;
 
     LimitedQueue<int> queue(qlenght);
+    
+    answer = 'Y';
+    while (answer != 'q' && answer != 'Q') {
+        std::cout << "What do you want to do with the queue? (A - add / G - get / Q - quit): ";
+        std::cin >> answer;
 
-    std::cout << "Enter " << qlenght << " ints: " << std::endl;
-    try {
-        while (j != qlenght) {
-            int element;
-            std::cin >> element;
-
-            queue.enQueue(element);
-            j++;
+        if (answer == 'G' || answer == 'g') {
+            try {
+                std::cout << "Taken: " << queue.deQueue() << std::endl;
+            }
+            catch (const LimitedQueue<int>::QueueUnderflow& e) {
+                std::cerr << "Error: " << e.getMessage() << "\n";
+                return 1;
+            }
         }
-    }
-    catch (const LimitedQueue<int>::QueueOverflow& e) {
-        std::cerr << "Error: " << e.getMessage() << "\n";
-        return 1;
-    }
-
-    if (!queue.isEmpty()) std::cout << "Queue is not empty" << std::endl;
-
-    try {
-        char answer = 'Y';
-        while (answer == 'Y' || answer == 'y') {
-            std::cout << "Do you want to pick up an item from the queue? (Y/N): ";
-            std::cin >> answer;
-            if (answer == 'Y' || answer == 'y') std::cout << "Taken: " << queue.deQueue() << std::endl;
-            else if (answer == 'N' || answer == 'n') std::cout << "Ok. End of the test... " << std::endl;
-            else std::cout << "Unknown character!" << std::endl;
+        else if (answer == 'A' || answer == 'a') {
+            try {
+                std::cout << "How many elements do you want to add: ";
+                int j = 0;
+                std::cin >> j;
+                for (int i = 0; i < j; i++) {
+                    int element;
+                    std::cin >> element;
+                    queue.enQueue(element);
+                }
+            }
+            catch (const LimitedQueue<int>::QueueOverflow& e) {
+                std::cerr << "Error: " << e.getMessage() << "\n";
+                return 1;
+            }
         }
-    }
-    catch (const LimitedQueue<int>::QueueUnderflow& e) {
-        std::cerr << "Error: " << e.getMessage() << "\n";
-        return 1;
+        else if (answer == 'Q' || answer == 'q') { std::cout << "Ok. End of the test... " << std::endl; }
+        else { std::cout << "Unknown character!" << std::endl; }
     }
 
     return 0;

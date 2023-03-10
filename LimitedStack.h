@@ -77,14 +77,26 @@ std::string LimitedStack<T>::WrongStackSize::getMessage() const { return message
 //-------------------------------realization of LimitedStack class----------------------------------//
 template <class T>
 LimitedStack<T>::LimitedStack(size_t size) : size_(size), top_(0) {
-	try { array_ = new T[size + 1]; }
-	catch (const LimitedStack<T>::WrongStackSize& e) { throw WrongStackSize("Wrong stack size!"); }
+	try {
+		if (size <= 100000) { array_ = new T[size + 1]; }
+		else { throw WrongStackSize("Wrong stack size!"); }
+	}
+	catch (const LimitedStack<T>::WrongStackSize& e) {
+		std::cerr << "Error: " << e.getMessage() << "\n";
+		exit(1);
+	}
 }
 
 template <class T>
 LimitedStack<T>::LimitedStack(const LimitedStack<T>& src) : size_(src.size_), top_(src.top_) {
-	try { array_ = new T[src.size_ + 1]; }
-	catch (const LimitedStack<T>::WrongStackSize& e) { throw WrongStackSize("Wrong stack size!"); }
+	try {
+		if (src.size_ <= 100000) { array_ = new T[src.size_ + 1]; }
+		else { throw WrongStackSize("Wrong stack size!"); }
+	}
+	catch (const LimitedStack<T>::WrongStackSize& e) {
+		std::cerr << "Error: " << e.getMessage() << "\n";
+		exit(1);
+	}
 
 	for (size_t i = 1; i < src.top_; i++) {
 		array_[i] = src.array_[i];

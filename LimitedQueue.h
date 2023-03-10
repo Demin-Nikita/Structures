@@ -8,7 +8,9 @@ class LimitedQueue : public Queue<T>
 private:
 	T* array_;
 	size_t top_;
+	size_t bot_;
 	size_t size_;
+	size_t count_;
 	void swap(LimitedQueue<T>& src);
 
 public:
@@ -17,7 +19,7 @@ public:
 	LimitedQueue(LimitedQueue<T>&& src) = delete;
 	LimitedQueue& operator=(const LimitedQueue<T>& src) = delete;
 	LimitedQueue& operator=(LimitedQueue<T>&& src) = delete;
-	~LimitedQueue();
+	~LimitedQueue() = default;
 	bool isEmpty();
 	void enQueue(const T& e);
 	const T deQueue();
@@ -76,23 +78,31 @@ std::string LimitedQueue<T>::WrongQueueSize::getMessage() const { return message
 
 //-------------------------------realization of LimitedQueue class----------------------------------//
 template <class T>
-LimitedQueue<T>::LimitedQueue(size_t size) : size_(size), top_(0) {
-	try { array_ = new T[size + 1]; }
-	catch (const LimitedQueue<T>::WrongQueueSize& e) { throw WrongQueueSize("Wrong queue size!"); }
-}
-
-template <class T>
-LimitedQueue<T>::LimitedQueue(const LimitedQueue<T>& src) : size_(src.size_), top_(src.top_) {
-	try { array_ = new T[src.size_ + 1]; }
-	catch (const LimitedQueue<T>::WrongQueueSize& e) { throw WrongQueueSize("Wrong queue size!"); }
-
-	for (size_t i = 1; i < src.top_; i++) {
-		array_[i] = src.array_[i];
+LimitedQueue<T>::LimitedQueue(size_t size) : size_(size), top_(0), bot_(0), count_(0) {
+	try {
+		if (size <= 100000) { array_ = new T[size + 1]; }
+		else { throw WrongQueueSize("Wrong queue size!"); }
+	}
+	catch (const LimitedQueue<T>::WrongQueueSize& e) {
+		std::cerr << "Error: " << e.getMessage() << "\n";
+		exit(1);
 	}
 }
 
 template <class T>
-LimitedQueue<T>::~LimitedQueue() { delete[] array_; }
+LimitedQueue<T>::LimitedQueue(const LimitedQueue<T>& src) : size_(src.size_), top_(src.top_), count_(src.count_) {
+	try {
+		if (src.size_ <= 100000) { array_ = new T[src.size_ + 1]; }
+		else { throw WrongQueueSize("Wrong queue size!"); }
+	}
+	catch (const LimitedQueue<T>::WrongQueueSize& e) {
+		std::cerr << "Error: " << e.getMessage() << "\n";
+		exit(1);
+	}
+	for (size_t i = 1; i < src.top_; i++) {
+		array_[i] = src.array_[i];
+	}
+}
 
 template <class T>
 void LimitedQueue<T>::swap(LimitedQueue<T>& src) {
@@ -102,23 +112,19 @@ void LimitedQueue<T>::swap(LimitedQueue<T>& src) {
 }
 
 template <class T>
-bool LimitedQueue<T>::isEmpty() { return top_ == 0; }
+bool LimitedQueue<T>::isEmpty() { return top_ == bot_; }
 
 template <class T>
 void LimitedQueue<T>::enQueue(const T& e) {
-	if (top_ == size_) { throw QueueOverflow("No space in the queue!"); }
-	array_[top_++] = e;
+	if (count_ == size_) { throw QueueOverflow("No space in the queue!"); }
+	array_[(++top_) % (size_ + 1) + (top_ / size_)] = e;
+	count_++;
 }
 
 template <class T>
 const T LimitedQueue<T>::deQueue() {
 	if (isEmpty()) { throw QueueUnderflow("Not enough elements in the queue!"); }
-	T res = array_[0];
-	for (int i = 1; i < top_; i++) {
-		std::cout << array_[i];
-		array_[i - 1] = array_[i];
-	}
-	top_--;
-	return res;
+	count_--;
+	return array_[(++bot_) % (size_ + 1) + (bot_ / size_)];
 }
 //--------------------------------------------------------------------------------------------------//
